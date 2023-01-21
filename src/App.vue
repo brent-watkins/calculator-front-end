@@ -1,53 +1,42 @@
 <script setup>
-import HelloWorld from "./components/HelloWorld.vue";
-import TheWelcome from "./components/TheWelcome.vue";
+import { computed, ref } from "vue";
+
+import AccountButton from "./components/AccountButton.vue";
+import AccountIcon from "./components/AccountIcon.vue";
+import ErrorPage from "./components/ErrorPage.vue";
+import HomePage from "./components/HomePage.vue";
+
+const currentPath = ref(window.location.hash);
+const loggedIn = ref(false);
+const username = ref("");
+
+const routes = {
+  "/": HomePage,
+};
+
+const currentPage = computed(() => {
+  return routes[currentPath.value.slice(1) || "/"] || ErrorPage;
+});
+
+window.addEventListener("hashchange", () => {
+  currentPath.value = window.location.hash;
+});
 </script>
 
 <template>
-  <header>
-    <img
-      alt="Vue logo"
-      class="logo"
-      src="./assets/logo.svg"
-      width="125"
-      height="125"
-    />
+  <v-app>
+    <v-app-bar>
+      <template v-slot:prepend>
+        <v-app-bar-title>Web Calculator</v-app-bar-title>
+      </template>
+      <template v-slot:append>
+        <AccountIcon v-if="loggedIn" :username="username" />
+        <AccountButton :logged-in="loggedIn" />
+      </template>
+    </v-app-bar>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
-  </header>
-
-  <main>
-    <TheWelcome />
-  </main>
+    <v-main>
+      <component :is="currentPage" />
+    </v-main>
+  </v-app>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
