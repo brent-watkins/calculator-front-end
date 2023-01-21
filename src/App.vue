@@ -5,6 +5,8 @@ import AccountButton from "./components/AccountButton.vue";
 import AccountIcon from "./components/AccountIcon.vue";
 import ErrorPage from "./components/ErrorPage.vue";
 import HomePage from "./components/HomePage.vue";
+import LoginPage from "./components/LoginPage.vue";
+import LogoutPage from "./components/LogoutPage.vue";
 
 const currentPath = ref(window.location.hash);
 const loggedIn = ref(false);
@@ -12,6 +14,8 @@ const username = ref("");
 
 const routes = {
   "/": HomePage,
+  "/login": LoginPage,
+  "/logout": LogoutPage,
 };
 
 const currentPage = computed(() => {
