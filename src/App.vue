@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 
 import AccountButton from "./components/AccountButton.vue";
 import AccountIcon from "./components/AccountIcon.vue";
+import CalculatorPage from "./components/CalculatorPage.vue";
 import ErrorPage from "./components/ErrorPage.vue";
 import HomePage from "./components/HomePage.vue";
 import LoginPage from "./components/LoginPage.vue";
@@ -14,6 +15,7 @@ const username = ref("");
 
 const routes = {
   "/": HomePage,
+  "/calculator": CalculatorPage,
   "/login": LoginPage,
   "/logout": LogoutPage,
 };
