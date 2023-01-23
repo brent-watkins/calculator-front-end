@@ -13,7 +13,11 @@ const password = ref("");
   <body>
     <div class="userinfo">
       <v-text-field label="Username" v-model="username"></v-text-field>
-      <v-text-field label="Password" v-model="password"></v-text-field>
+      <v-text-field
+        label="Password"
+        type="password"
+        v-model="password"
+      ></v-text-field>
     </div>
     <div class="login">
       <v-btn prepend-icon="mdi-login">Login</v-btn>
