@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 
 const balance = ref(10);
+const url = ref("");
 const result = ref("");
 const selectedOption = ref("");
 const operations = [
@@ -19,38 +20,85 @@ function addOperand() {
 }
 
 function removeOperand(removeIndex) {
-  console.log(operands.value.filter((operand, index) => index !== removeIndex));
   operands.value = operands.value.filter(
     (operand, index) => index !== removeIndex
   );
 }
 
+function postOperation() {
+  if (selectedOption.value === "Random String") {
+    fetch(url.value, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        result.value = data;
+      })
+      .catch((error) => {
+        console.log(
+          "Encountered an error while submitting operation request:",
+          error
+        );
+      });
+  } else {
+    const operationBody = operands.value.map((operand) => operand.num);
+    fetch(url.value, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ operands: operationBody }),
+      // credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        result.value = data;
+      })
+      .catch((error) => {
+        console.log(
+          "Encountered an error while submitting operation request:",
+          error
+        );
+      });
+  }
+}
+
 watch(selectedOption, () => {
+  result.value = ""; // Clear the result
+  // Set the required operands and the url
   switch (selectedOption.value) {
     case "Add":
       operands.value = [{ num: "" }, { num: "" }];
-      break;
-    case "Subtract":
-      operands.value = [{ num: "" }, { num: "" }];
-      break;
-    case "Multiply":
-      operands.value = [{ num: "" }, { num: "" }];
+      url.value = "http://127.0.0.1:8000/api/add/";
       break;
     case "Divide":
       operands.value = [{ num: "" }, { num: "" }];
+      url.value = "http://127.0.0.1:8000/api/divide/";
       break;
-    case "Square Root":
-      operands.value = [{ num: "" }];
+    case "Multiply":
+      operands.value = [{ num: "" }, { num: "" }];
+      url.value = "http://127.0.0.1:8000/api/multiply/";
       break;
     case "Random String":
       operands.value = [];
+      url.value = "http://127.0.0.1:8000/api/random_string/";
+      break;
+    case "Square Root":
+      operands.value = [{ num: "" }];
+      url.value = "http://127.0.0.1:8000/api/square_root/";
+      break;
+    case "Subtract":
+      operands.value = [{ num: "" }, { num: "" }];
+      url.value = "http://127.0.0.1:8000/api/subtract/";
       break;
     default:
       operands.value = [];
+      url.value = "";
   }
-});
-watch(selectedOption, () => {
-  result.value = "";
 });
 </script>
 
@@ -91,7 +139,7 @@ watch(selectedOption, () => {
                 required
                 :rules="[() => !!operands[index] || 'This field is required']"
                 type="number"
-                v-model="operands[index]"
+                v-model="operands[index].num"
               ></v-text-field>
               <v-btn
                 @click="removeOperand(index)"
@@ -106,10 +154,12 @@ watch(selectedOption, () => {
           required
           type="number"
           v-else-if="selectedOption === 'Square Root'"
+          v-model="operands[0].num"
         ></v-text-field>
-        <v-btn>Submit</v-btn>
+        <v-btn @click="postOperation">Submit</v-btn>
       </div>
     </div>
+    <br />
     <div>
       <p><strong>Result:</strong> {{ result }}</p>
     </div>
