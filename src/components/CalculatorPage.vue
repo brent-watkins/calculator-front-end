@@ -2,6 +2,7 @@
 import { ref, watch } from "vue";
 
 const balance = ref(10);
+const form = ref(false);
 const url = ref("");
 const result = ref("");
 const selectedOption = ref("");
@@ -25,7 +26,7 @@ function removeOperand(removeIndex) {
   );
 }
 
-function postOperation() {
+function onSubmit() {
   if (selectedOption.value === "Random String") {
     fetch(url.value, {
       method: "GET",
@@ -120,47 +121,54 @@ watch(selectedOption, () => {
         v-model="selectedOption"
       ></v-select>
       <div class="operands" v-if="selectedOption !== ''">
-        <div
-          v-if="
-            selectedOption !== 'Square Root' &&
-            selectedOption !== 'Random String'
-          "
-          class="multiple"
-        >
-          <v-btn @click="addOperand">Add another operand</v-btn>
-          <br />
-          <br />
-          <hr />
-          <br />
-          <div v-for="(operand, index) in operands" :key="index">
-            <div class="operand">
-              <v-text-field
-                label="Operand"
-                required
-                :rules="[() => !!operands[index] || 'This field is required']"
-                type="number"
-                v-model="operands[index].num"
-              ></v-text-field>
-              <v-btn
-                @click="removeOperand(index)"
-                :disabled="operands.length < 3"
-                icon="mdi-close"
-              >
-              </v-btn>
+        <v-form v-model="form" @submit.prevent="onSubmit">
+          <div
+            v-if="
+              selectedOption !== 'Square Root' &&
+              selectedOption !== 'Random String'
+            "
+            class="multiple"
+          >
+            <v-btn @click="addOperand">Add another operand</v-btn>
+            <br />
+            <br />
+            <hr />
+            <br />
+            <div v-for="(operand, index) in operands" :key="index">
+              <div class="operand">
+                <v-text-field
+                  label="Operand"
+                  :rules="[
+                    () => !!operands[index].num || 'This field is required',
+                  ]"
+                  type="number"
+                  v-model="operands[index].num"
+                ></v-text-field>
+                <v-btn
+                  @click="removeOperand(index)"
+                  :disabled="operands.length < 3"
+                  icon="mdi-close"
+                >
+                </v-btn>
+              </div>
             </div>
           </div>
-        </div>
-        <v-text-field
-          required
-          type="number"
-          v-else-if="selectedOption === 'Square Root'"
-          v-model="operands[0].num"
-        ></v-text-field>
-        <v-btn @click="postOperation">Submit</v-btn>
+          <v-text-field
+            :rules="[
+              () => !!operands[0].num || 'This field is required',
+              () => operands[0].num >= 0 || 'Value must be non-negative',
+            ]"
+            type="number"
+            v-else-if="selectedOption === 'Square Root'"
+            v-model="operands[0].num"
+          ></v-text-field>
+          <!-- Input values cannot be negative! -->
+          <v-btn @click="onSubmit" :disabled="!form">Submit</v-btn>
+        </v-form>
       </div>
     </div>
     <br />
-    <div>
+    <div v-if="selectedOption !== ''">
       <p><strong>Result:</strong> {{ result }}</p>
     </div>
   </body>
