@@ -3,9 +3,7 @@ import { ref, watch } from "vue";
 
 const balance = ref(10);
 const form = ref(false);
-const url = ref("");
-const result = ref("");
-const selectedOption = ref("");
+const loading = ref(false);
 const operations = [
   "Add",
   "Subtract",
@@ -15,6 +13,9 @@ const operations = [
   "Random String",
 ];
 const operands = ref([]);
+const result = ref("");
+const selectedOption = ref("");
+const url = ref("");
 
 function addOperand() {
   operands.value.push({ num: "" });
@@ -27,6 +28,7 @@ function removeOperand(removeIndex) {
 }
 
 function onSubmit() {
+  loading.value = true;
   if (selectedOption.value === "Random String") {
     fetch(url.value, {
       method: "GET",
@@ -43,6 +45,9 @@ function onSubmit() {
           "Encountered an error while submitting operation request:",
           error
         );
+      })
+      .finally(() => {
+        loading.value = false;
       });
   } else {
     const operationBody = operands.value.map((operand) => operand.num);
@@ -64,6 +69,9 @@ function onSubmit() {
           "Encountered an error while submitting operation request:",
           error
         );
+      })
+      .finally(() => {
+        loading.value = false;
       });
   }
 }
@@ -156,14 +164,25 @@ watch(selectedOption, () => {
           <v-text-field
             :rules="[
               () => !!operands[0].num || 'This field is required',
-              () => operands[0].num >= 0 || 'Value must be non-negative',
+              () => !!operands[0].num >= 0 || 'Value must be non-negative',
             ]"
             type="number"
             v-else-if="selectedOption === 'Square Root'"
             v-model="operands[0].num"
           ></v-text-field>
-          <!-- Input values cannot be negative! -->
-          <v-btn @click="onSubmit" :disabled="!form">Submit</v-btn>
+          <v-btn
+            @click="onSubmit"
+            :disabled="
+              balance === 0
+                ? true
+                : selectedOption !== 'Random String'
+                ? !form
+                : false
+            "
+            :loading="loading"
+          >
+            Submit
+          </v-btn>
         </v-form>
       </div>
     </div>
