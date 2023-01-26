@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
+const props = defineProps(["loggedIn"]);
+
 const email = ref("");
 const form = ref(false);
 const loading = ref(false);
@@ -10,6 +12,10 @@ const password = ref("");
 const passwordVisibility = ref("password");
 const response = ref("");
 const startingBalance = ref();
+
+if (props.loggedIn) {
+  window.location.hash = "/calculator";
+}
 
 function handleVisibility() {
   passwordVisibility.value =

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 import AccountButton from "./components/AccountButton.vue";
 import AccountIcon from "./components/AccountIcon.vue";
@@ -13,6 +13,14 @@ import RegisterPage from "./components/RegisterPage.vue";
 const currentPath = ref(window.location.hash);
 const loggedIn = ref(false);
 const username = ref("");
+
+watch(username, () => {
+  if (username.value) {
+    loggedIn.value = true;
+  } else {
+    loggedIn.value = false;
+  }
+});
 
 const routes = {
   "/": HomePage,
@@ -44,7 +52,11 @@ window.addEventListener("hashchange", () => {
     </v-app-bar>
 
     <v-main>
-      <component :is="currentPage" />
+      <component
+        :is="currentPage"
+        :logged-in="loggedIn"
+        @user="(user) => (username = user)"
+      />
     </v-main>
   </v-app>
 </template>
