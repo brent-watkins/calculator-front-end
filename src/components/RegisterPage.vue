@@ -3,11 +3,13 @@ import { ref } from "vue";
 
 const email = ref("");
 const form = ref(false);
+const loading = ref(false);
 const MIN_BALANCE = 0;
 const MAX_BALANCE = 999999.99;
 const password = ref("");
 const passwordVisibility = ref("password");
-const startingBalance = ref(10);
+const response = ref("");
+const startingBalance = ref();
 
 function handleVisibility() {
   passwordVisibility.value =
@@ -15,7 +17,34 @@ function handleVisibility() {
 }
 
 function onSubmit() {
-  // Submit the username, password, and startingBalance
+  const credentials = {
+    balance: startingBalance.value,
+    password: password.value,
+    status: "I", // Inactive. If registration is successful, new users will still have to log in
+    username: email.value,
+  };
+  loading.value = true;
+  fetch("http://127.0.0.1:8000/api/register/", {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      response.value = data;
+    })
+    .catch((error) => {
+      console.log(
+        "Encountered an error while trying to create your account:",
+        error
+      );
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 </script>
 
@@ -27,11 +56,14 @@ function onSubmit() {
   <body>
     <div class="userinfo">
       <v-form v-model="form" @submit.prevent="onSubmit">
+        <p>Note: your email will be your username</p>
         <v-text-field
           label="Email Address"
           :rules="[
             () => !!email || 'E-mail is required',
-            (email) => /.+@.+\..+/.test(email) || 'E-mail must be valid',
+            (email) =>
+              /.+@.+\..+/.test(email) ||
+              'E-mail must be valid (ex. example@example.com)',
           ]"
           v-model="email"
         ></v-text-field>
@@ -40,8 +72,7 @@ function onSubmit() {
           :rules="[
             () => !!password || 'Password is required',
             () =>
-              !!password.length < 8 ||
-              'Password must be at least 8 characters long',
+              password.length >= 8 || 'Password must be at least 8 characters',
           ]"
           :type="passwordVisibility"
           v-model="password"
@@ -58,11 +89,12 @@ function onSubmit() {
           label="Starting Balance"
           :max="MAX_BALANCE"
           :min="MIN_BALANCE"
-          :rule="[
+          :rules="[
+            () => !!startingBalance || 'Balance is required',
             () =>
-              !!startingBalance < MIN_BALANCE ||
+              startingBalance >= MIN_BALANCE ||
               'Balance must be greater than 0',
-            () => !!startingBalance > MAX_BALANCE || 'Balance exceeds maximum',
+            () => startingBalance <= MAX_BALANCE || 'Balance exceeds maximum',
           ]"
           step="0.01"
           type="number"
@@ -70,10 +102,23 @@ function onSubmit() {
         ></v-text-field>
       </v-form>
     </div>
+    <br />
     <div class="create">
-      <v-btn @click="onSubmit" prepend-icon="mdi-account-plus">
+      <v-btn
+        @click="onSubmit"
+        :disabled="!form"
+        :loading="loading"
+        prepend-icon="mdi-account-plus"
+      >
         Create Account
       </v-btn>
+    </div>
+    <br />
+    <div class="result">
+      <p>
+        <strong>{{ response }}</strong>
+      </p>
+      <p>Click <a href="/#/login">here</a> to log in</p>
     </div>
   </body>
 </template>
@@ -95,6 +140,9 @@ body {
 header {
   text-align: center;
 }
+.result {
+  text-align: center;
+}
 .userinfo {
   align-items: stretch;
   display: flex;
@@ -102,5 +150,6 @@ header {
   justify-content: center;
   max-width: 50%;
   min-width: 30%;
+  text-align: center;
 }
 </style>
