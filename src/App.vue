@@ -8,6 +8,7 @@ import ErrorPage from "./components/ErrorPage.vue";
 import HomePage from "./components/HomePage.vue";
 import LoginPage from "./components/LoginPage.vue";
 import LogoutPage from "./components/LogoutPage.vue";
+import RegisterPage from "./components/RegisterPage.vue";
 
 const currentPath = ref(window.location.hash);
 const loggedIn = ref(false);
@@ -18,6 +19,7 @@ const routes = {
   "/calculator": CalculatorPage,
   "/login": LoginPage,
   "/logout": LogoutPage,
+  "/register": RegisterPage,
 };
 
 const currentPage = computed(() => {
