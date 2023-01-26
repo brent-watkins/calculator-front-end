@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from "vue";
 
-const username = ref("");
 const password = ref("");
+const username = ref("");
 </script>
 
 <template>
@@ -22,7 +22,9 @@ const password = ref("");
     <div class="login">
       <v-btn prepend-icon="mdi-login">Login</v-btn>
       <p>Need an account?</p>
-      <v-btn prepend-icon="mdi-account-plus">Create Account</v-btn>
+      <v-btn href="/#/register" prepend-icon="mdi-account-plus">
+        Create Account
+      </v-btn>
     </div>
   </body>
 </template>
