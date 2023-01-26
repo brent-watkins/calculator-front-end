@@ -17,6 +17,9 @@ const username = ref("");
 watch(username, () => {
   if (username.value) {
     loggedIn.value = true;
+    if (currentPath.value === "#/login") {
+      window.location.hash = "/calculator";
+    }
   } else {
     loggedIn.value = false;
   }
@@ -55,6 +58,7 @@ window.addEventListener("hashchange", () => {
       <component
         :is="currentPage"
         :logged-in="loggedIn"
+        :username="username"
         @user="(user) => (username = user)"
       />
     </v-main>

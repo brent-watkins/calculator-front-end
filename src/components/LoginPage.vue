@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from "vue";
 
-const props = defineProps(["loggedIn"]);
+const props = defineProps(["loggedIn", "username"]);
 const emits = defineEmits(["user"]);
 
 const loading = ref(false);
