@@ -1,6 +1,8 @@
 <script setup>
 import { ref, watch } from "vue";
 
+const props = defineProps(["loggedIn"]);
+
 const balance = ref(10);
 const form = ref(false);
 const loading = ref(false);
@@ -109,17 +111,24 @@ watch(selectedOption, () => {
       url.value = "";
   }
 });
+console.log(props.loggedIn);
 </script>
 
 <template>
   <header>
-    <h1>Welcome to the Web Calculator!</h1>
-    <h3>Your balance currently is: {{ balance }}</h3>
-    <v-alert v-if="balance === 0" type="warning">
-      Your balance has reached 0. You will not be able to make any new requests.
-    </v-alert>
+    <div v-if="props.loggedIn">
+      <h1>Welcome to the Web Calculator!</h1>
+      <h3>Your balance currently is: {{ balance }}</h3>
+      <v-alert v-if="balance === 0" type="warning">
+        Your balance has reached 0. You will not be able to make any new
+        requests.
+      </v-alert>
+    </div>
+    <div v-else>
+      <h1>You need to log in before accessing this page.</h1>
+    </div>
   </header>
-  <body>
+  <body v-if="props.loggedIn">
     <h4>What would you like to do?</h4>
     <br />
     <div class="selection">

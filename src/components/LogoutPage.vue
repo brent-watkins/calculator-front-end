@@ -1,3 +1,12 @@
+<script setup>
+const props = defineProps(["loggedIn"]);
+const emits = defineEmits(["user"]);
+
+if (props.loggedIn) {
+  emits("user", "");
+}
+</script>
+
 <template>
   <header>
     <h1>You have logged out.</h1>

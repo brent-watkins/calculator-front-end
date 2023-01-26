@@ -1,8 +1,49 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
+const props = defineProps(["loggedIn"]);
+const emits = defineEmits(["user"]);
+
+const loading = ref(false);
 const password = ref("");
+const response = ref("");
 const username = ref("");
+
+if (props.loggedIn) {
+  window.location.hash = "/calculator";
+}
+
+watch(response, () => {
+  if (response.value === username.value) {
+    emits("user", response.value);
+  }
+});
+
+function onSubmit() {
+  const credentials = {
+    password: password.value,
+    username: username.value,
+  };
+  loading.value = true;
+  fetch("http://127.0.0.1:8000/api/login/", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      response.value = data;
+    })
+    .catch((error) => {
+      console.log("Encountered an error while attempting to log in:", error);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
 </script>
 
 <template>
@@ -20,7 +61,13 @@ const username = ref("");
       ></v-text-field>
     </div>
     <div class="login">
-      <v-btn prepend-icon="mdi-login">Login</v-btn>
+      <v-btn @click="onSubmit" :loading="loading" prepend-icon="mdi-login">
+        Log In
+      </v-btn>
+      <p>
+        <strong>{{ response }}</strong>
+      </p>
+      <br />
       <p>Need an account?</p>
       <v-btn href="/#/register" prepend-icon="mdi-account-plus">
         Create Account
