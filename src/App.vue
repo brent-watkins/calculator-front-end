@@ -3,12 +3,15 @@ import { computed, ref, watch } from "vue";
 
 import AccountButton from "./components/AccountButton.vue";
 import AccountIcon from "./components/AccountIcon.vue";
+import CalculatorButton from "./components/CalculatorButton.vue";
 import CalculatorPage from "./components/CalculatorPage.vue";
 import ErrorPage from "./components/ErrorPage.vue";
 import HomePage from "./components/HomePage.vue";
 import LoginPage from "./components/LoginPage.vue";
 import LogoutPage from "./components/LogoutPage.vue";
+import RecordsPage from "./components/RecordsPage.vue";
 import RegisterPage from "./components/RegisterPage.vue";
+import RecordsButton from "./components/RecordsButton.vue";
 
 const currentPath = ref(window.location.hash);
 const loggedIn = ref(false);
@@ -30,6 +33,7 @@ const routes = {
   "/calculator": CalculatorPage,
   "/login": LoginPage,
   "/logout": LogoutPage,
+  "/records": RecordsPage,
   "/register": RegisterPage,
 };
 
@@ -50,6 +54,8 @@ window.addEventListener("hashchange", () => {
       </template>
       <template v-slot:append>
         <AccountIcon v-if="loggedIn" :username="username" />
+        <RecordsButton :logged-in="loggedIn" />
+        <CalculatorButton :logged-in="loggedIn" />
         <AccountButton :logged-in="loggedIn" />
       </template>
     </v-app-bar>
