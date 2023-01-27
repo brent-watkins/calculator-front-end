@@ -1,9 +1,9 @@
 <script setup>
 import { ref, watch } from "vue";
 
-const props = defineProps(["loggedIn"]);
+const props = defineProps(["loggedIn", "username"]);
 
-const balance = ref(10);
+const balance = ref();
 const form = ref(false);
 const loading = ref(false);
 const operations = [
@@ -23,6 +23,30 @@ function addOperand() {
   operands.value.push({ num: "" });
 }
 
+function getBalance() {
+  fetch("http://127.0.0.1:8000/api/balance/", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username: props.username }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      balance.value = data;
+    })
+    .catch((error) => {
+      console.log(
+        "Encountered an error while attempting to get balance:",
+        error
+      );
+    });
+}
+
+// Get the balance when the page loads
+getBalance();
+
 function removeOperand(removeIndex) {
   operands.value = operands.value.filter(
     (operand, index) => index !== removeIndex
@@ -31,51 +55,33 @@ function removeOperand(removeIndex) {
 
 function onSubmit() {
   loading.value = true;
-  if (selectedOption.value === "Random String") {
-    fetch(url.value, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
+  const operationBody = operands.value.map((operand) => operand.num);
+  fetch(url.value, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      operands: operationBody,
+      username: props.username,
+    }),
+    // credentials: "include",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      result.value = data;
     })
-      .then((response) => response.json())
-      .then((data) => {
-        result.value = data;
-      })
-      .catch((error) => {
-        console.log(
-          "Encountered an error while submitting operation request:",
-          error
-        );
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  } else {
-    const operationBody = operands.value.map((operand) => operand.num);
-    fetch(url.value, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ operands: operationBody }),
-      // credentials: "include",
+    .catch((error) => {
+      console.log(
+        "Encountered an error while submitting operation request:",
+        error
+      );
     })
-      .then((response) => response.json())
-      .then((data) => {
-        result.value = data;
-      })
-      .catch((error) => {
-        console.log(
-          "Encountered an error while submitting operation request:",
-          error
-        );
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
+    .finally(() => {
+      loading.value = false;
+      getBalance();
+    });
 }
 
 watch(selectedOption, () => {
@@ -111,7 +117,6 @@ watch(selectedOption, () => {
       url.value = "";
   }
 });
-console.log(props.loggedIn);
 </script>
 
 <template>
@@ -119,9 +124,9 @@ console.log(props.loggedIn);
     <div v-if="props.loggedIn">
       <h1>Welcome to the Web Calculator!</h1>
       <h3>Your balance currently is: {{ balance }}</h3>
-      <v-alert v-if="balance === 0" type="warning">
-        Your balance has reached 0. You will not be able to make any new
-        requests.
+      <v-alert v-if="balance < 3" type="warning">
+        Your balance is low. You might not be able to perform certain
+        operations.
       </v-alert>
     </div>
     <div v-else>
