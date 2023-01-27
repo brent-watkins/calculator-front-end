@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps(["loggedIn", "username"]);
 
@@ -10,10 +10,6 @@ const loading = ref(false);
 const rowsPerPage = ref(10);
 
 const rowsPerPageOptions = [10, 25, 50, 75, 100];
-
-watch(allRecords, () => {
-  console.log(allRecords.value);
-});
 
 const filteredRecords = computed(() => {
   if (filter.value) {
@@ -65,7 +61,6 @@ function getRecords() {
 getRecords();
 
 function hideRecord(recordId) {
-  console.log(recordId);
   fetch("http://127.0.0.1:8000/api/records/", {
     method: "PUT",
     headers: {
