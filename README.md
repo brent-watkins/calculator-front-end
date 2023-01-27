@@ -5,6 +5,14 @@ To run the website locally, follow the Project Setup and Run Development Server 
 
 ## Project Setup
 
+Clone the repository
+
+```sh
+git clone https://github.com/brent-watkins/calculator-front-end.git
+```
+
+Then install the necessary packages
+
 ```sh
 npm install
 ```
